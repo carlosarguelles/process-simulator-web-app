@@ -6,4 +6,5 @@ export interface Process {
   priority: boolean;
   quantum: number;
   user: string;
+  cpuTime: number;
 }
