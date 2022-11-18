@@ -4,8 +4,10 @@ import { Simulator } from "@/components/common";
 </script>
 
 <template>
-  <Layout>
-    <template #title>Procesos</template>
-    <Simulator />
-  </Layout>
+  <KeepAlive>
+    <Layout>
+      <template #title>Procesos</template>
+      <Simulator />
+    </Layout>
+  </KeepAlive>
 </template>

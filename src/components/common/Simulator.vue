@@ -4,6 +4,7 @@ import { onMounted, ref } from "vue";
 import { Process, Stack } from "@/components/ui";
 import { Report } from "@/components/common";
 import { useCatalogsStore } from "@/store/CatalogsStore";
+import { computed } from "@vue/reactivity";
 
 const catalogsStore = useCatalogsStore();
 
@@ -50,7 +51,11 @@ function simulate() {
   );
 }
 
-function stop() {}
+const processesInQueue = computed(() => {
+  return queue.value?.slice(1);
+});
+
+const runningProcess = computed(() => queue.value?.slice(0, 1)[0]);
 </script>
 
 <template>
@@ -76,27 +81,18 @@ function stop() {}
       >
         Ejecutar
       </button>
-      <button
-        class="rounded-md bg-red-500 p-2 font-bold tracking-wide text-white"
-        @click="stop"
-      >
-        Cancelar
-      </button>
     </div>
     <div>
       <Stack title="En cola">
-        <Process v-for="p in queue" :process="p"></Process>
+        <Process v-for="p in processesInQueue" :process="p"></Process>
       </Stack>
       <Stack title="Ejecución">
-        <Process
-          v-if="queue && queue.length > 0"
-          :process="queue![0]"
-        ></Process>
+        <Process v-if="runningProcess" :process="runningProcess"></Process>
       </Stack>
       <Stack title="Listos">
         <Process v-for="p in done" :process="p"></Process>
       </Stack>
-      <Report v-if="done" :processes="done" />
+      <Report v-if="done && done.length > 0" :processes="done" />
     </div>
   </div>
 </template>
