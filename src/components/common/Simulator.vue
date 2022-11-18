@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { Catalog, Process as TProcess } from "@/types";
-import { ref } from "vue";
+import type { Process as TProcess } from "@/types";
+import { onMounted, ref } from "vue";
 import { Process, Stack } from "@/components/ui";
+import { Report } from "@/components/common";
 import { useCatalogsStore } from "@/store/CatalogsStore";
 
 const catalogsStore = useCatalogsStore();
@@ -12,10 +13,13 @@ const done = ref<TProcess[]>();
 const queue = ref<TProcess[]>();
 
 connection.onmessage = (e: MessageEvent<string>) => {
-  const data = JSON.parse(e.data);
-  console.log({ data });
-  done.value = data.done;
-  queue.value = data.queue;
+  if (e.data.includes("[")) {
+    const data = JSON.parse(e.data);
+    done.value = data.done;
+    queue.value = data.queue;
+  } else {
+    console.log(e.data);
+  }
 };
 
 connection.onopen = () =>
@@ -24,6 +28,7 @@ connection.onopen = () =>
 connection.onclose = () => console.log("Connection closed");
 
 const selectedCatalog = ref("");
+const quantum = ref(0);
 
 function simulate() {
   const catalog = catalogsStore.find(selectedCatalog.value);
@@ -31,6 +36,18 @@ function simulate() {
     alert("Catalogo no encontrado");
     return;
   }
+
+  if (quantum.value < 0) {
+    alert("El quantum no puede ser cero");
+    return;
+  }
+
+  connection.send(
+    JSON.stringify({
+      quantum: quantum.value,
+      processList: catalog.processes,
+    })
+  );
 }
 
 function stop() {}
@@ -38,24 +55,29 @@ function stop() {}
 
 <template>
   <div class="space-y-4">
-    <label>Seleccione un catalogo</label>
+    <label>Seleccione un catalogo y quantum</label>
     <div class="flex gap-2">
       <select
-        class="appearance-none text-white tracking-wide bg-transparent border border-teal-500 rounded-md p-2 focus:border-teal-600 focus:ring-teal-400 flex-1"
+        class="flex-1 appearance-none rounded-md border border-teal-500 bg-transparent p-2 tracking-wide text-white focus:border-teal-600 focus:ring-teal-400"
         v-model="selectedCatalog"
       >
         <option v-for="c in catalogsStore.catalogs" :value="c.name">
           {{ c.name }}
         </option>
       </select>
+      <input
+        type="number"
+        class="appearance-none rounded-md border border-teal-500 bg-transparent p-2 tracking-wide text-white focus:border-teal-600 focus:ring-teal-400"
+        v-model="quantum"
+      />
       <button
-        class="font-bold tracking-wide p-2 rounded-md bg-teal-500"
+        class="rounded-md bg-teal-500 p-2 font-bold tracking-wide"
         @click="simulate"
       >
         Ejecutar
       </button>
       <button
-        class="font-bold tracking-wide p-2 rounded-md bg-red-500 text-white"
+        class="rounded-md bg-red-500 p-2 font-bold tracking-wide text-white"
         @click="stop"
       >
         Cancelar
@@ -74,6 +96,7 @@ function stop() {}
       <Stack title="Listos">
         <Process v-for="p in done" :process="p"></Process>
       </Stack>
+      <Report v-if="done" :processes="done" />
     </div>
   </div>
 </template>

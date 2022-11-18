@@ -11,6 +11,8 @@ export interface Process {
   finalTime: number;
   arrivalTime: number;
   burstTime: number;
+  initialBurstTime: number;
+  turnAround: number;
   state: "DONE" | "READY" | "RUNNING";
   isSelected?: boolean;
 }
