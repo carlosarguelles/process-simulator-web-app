@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ProcessApi } from "@/api/Process";
 import { Stack, Process } from "@/components/ui";
-import { useQuery, useQueryClient } from "vue-query";
-
-useQueryClient();
+import { useQuery } from "vue-query";
 
 const { data } = useQuery({
   queryKey: ["processes"],

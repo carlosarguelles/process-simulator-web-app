@@ -7,4 +7,10 @@ export interface Process {
   quantum: number;
   user: string;
   cpuTime: number;
+  executions: number;
+  finalTime: number;
+  arrivalTime: number;
+  burstTime: number;
+  state: "DONE" | "READY" | "RUNNING";
+  isSelected?: boolean;
 }

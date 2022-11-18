@@ -19,7 +19,9 @@ let props = defineProps<{ process: Process }>();
       </li>
       <li>pid: {{ props.process.pid }}</li>
       <li>ejecuciones: {{ props.process.executions }}</li>
+      <li>rafaga: {{ props.process.burstTime }}</li>
       <li>quantum: {{ props.process.quantum }}</li>
+      <li>tiempo final: {{ props.process.finalTime }}</li>
     </ul>
   </article>
 </template>
